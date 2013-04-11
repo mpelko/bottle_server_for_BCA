@@ -69,35 +69,34 @@ def QAs(db):
 
 @app.route('/submit/Q', method="GET")
 def insert_Q(db):
-    bid = request.GET.get('bid')
-    title = request.GET.get('title')
-    usr = request.GET.get('username')
-    loc = request.GET.get('location')
-    qid = get_new_qid(db, bid)
-    db.execute("INSERT INTO questions VALUES (?,?,?,?,?)", (qid, bid, loc, title, usr))
+    try:
+        bid = request.GET.get('bid')
+        title = request.GET.get('title')
+        usr = request.GET.get('username')
+        loc = request.GET.get('location')
+        qid = get_new_qid(db, bid)
+        db.execute("INSERT INTO questions VALUES (?,?,?,?,?)", (qid, bid, loc, title, usr))
+        return jsonp({"daffodil":0})
+    except Exception, e:
+        return jsonp({"daffodil":1, "errormsg":str(e)})
 
 @app.route('/submit/A', method="GET")
 def insert_A(db):
-    # bit is redundant here.
-    bid = request.GET.get('bid')
-    text = request.GET.get('text')
-    usr = request.GET.get('username')
-    qid = get_new_qid(db, bid)
-    db.execute("INSERT INTO answers VALUES (?,?,?)", (text, qid, usr))
-
+    try:
+        bid = request.GET.get('bid')
+        text = request.GET.get('text')
+        usr = request.GET.get('username')
+        qid = get_new_qid(db, bid)
+        db.execute("INSERT INTO answers VALUES (?,?,?)", (text, qid, usr))
+        return jsonp({"daffodil":0})
+    except Exception, e:
+        return jsonp({"daffodil":1, "errormsg":str(e)})
 
 def get_new_qid(db, book_id):
     q = db.execute('SELECT qid FROM questions WHERE bid LIKE ?', (book_id,))
     curr_length = len(q.fetchall())
     return book_id + "_" + str(curr_length+1)
     
-
-@app.route('/submit/A', method="GET")
-def insert_A(db):
-    print "______________________________"
-    print request.GET.get('bid')
-
-
 #3. setup dreamhost passenger hook
 def application(environ, start_response):
     return app.wsgi(environ,start_response)
