@@ -52,7 +52,6 @@ def book_id(db):
 def QAs(db):
     bid = request.GET.get('bid')
     #print "/////////////"
-    print bid
     q = db.execute('SELECT qid, location, username, title FROM questions WHERE bid LIKE ?', (bid,))
     qs = q.fetchall()
     questions = []
@@ -64,7 +63,6 @@ def QAs(db):
     #result = {"QAs":[{"title":"asd","answers":[{"text":"asdasd", "username":"mpelko"}]}]}
     result = {"QAs":questions}
     #result = {"QAs":questions[0]}
-    print result
     return jsonp(request, result)
 
 @app.route('/submit/Q', method="GET")
@@ -76,9 +74,9 @@ def insert_Q(db):
         loc = request.GET.get('location')
         qid = get_new_qid(db, bid)
         db.execute("INSERT INTO questions VALUES (?,?,?,?,?)", (qid, bid, loc, title, usr))
-        return jsonp({"daffodil":0})
+        return jsonp(request,{"daffodil":0})
     except Exception, e:
-        return jsonp({"daffodil":1, "errormsg":str(e)})
+        return jsonp(request,{"daffodil":1, "errormsg":str(e)})
 
 @app.route('/submit/A', method="GET")
 def insert_A(db):
@@ -86,11 +84,11 @@ def insert_A(db):
         bid = request.GET.get('bid')
         text = request.GET.get('text')
         usr = request.GET.get('username')
-        qid = get_new_qid(db, bid)
-        db.execute("INSERT INTO answers VALUES (?,?,?)", (text, qid, usr))
-        return jsonp({"daffodil":0})
+        qid = request.GET.get('qid')
+        db.execute("INSERT INTO answers (text, qid, username) VALUES (?,?,?)", (text, qid, usr))
+        return jsonp(request,{"daffodil":0})
     except Exception, e:
-        return jsonp({"daffodil":1, "errormsg":str(e)})
+        return jsonp(request,{"daffodil":1, "errormsg":str(e)})
 
 def get_new_qid(db, book_id):
     q = db.execute('SELECT qid FROM questions WHERE bid LIKE ?', (book_id,))
