@@ -89,7 +89,7 @@ def insert_A(db):
         return jsonp(request,{"daffodil":0})
     except Exception, e:
         return jsonp(request,{"daffodil":1, "errormsg":str(e)})
-
+        
 def get_new_qid(db, book_id):
     q = db.execute('SELECT qid FROM questions WHERE bid LIKE ?', (book_id,))
     curr_length = len(q.fetchall())
